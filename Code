@@ -1,0 +1,475 @@
+# import important modules 
+
+​
+
+import pandas as pd
+
+import numpy as np
+
+import matplotlib.pyplot as plt
+
+import seaborn as sns
+
+import warnings
+
+warnings.filterwarnings('ignore')
+
+%matplotlib inline
+
+# Import data
+
+train_data = pd.read_csv('Train1.csv')
+
+​
+
+test_data = pd.read_csv('Test1.csv')
+
+train_data.shape
+
+(2100, 27)
+
+test_data.shape
+
+(905, 19)
+
+train_data.head().T
+
+	0 	1 	2 	3 	4
+CustomerId 	CustomerId_27 	CustomerId_27 	CustomerId_27 	CustomerId_27 	CustomerId_27
+TransactionStartTime 	43364.5 	43368.4 	43368.4 	43370.4 	43370.5
+Value 	550 	550 	550 	1000 	500
+Amount 	-550 	-550 	-550 	-1000 	-500
+TransactionId 	TransactionId_1683 	TransactionId_2235 	TransactionId_1053 	TransactionId_2633 	TransactionId_71
+BatchId 	BatchId_641 	BatchId_820 	BatchId_210 	BatchId_876 	BatchId_1362
+SubscriptionId 	SubscriptionId_2 	SubscriptionId_2 	SubscriptionId_4 	SubscriptionId_4 	SubscriptionId_4
+CurrencyCode 	UGX 	UGX 	UGX 	UGX 	UGX
+CountryCode 	256 	256 	256 	256 	256
+ProviderId 	ProviderId_1 	ProviderId_1 	ProviderId_1 	ProviderId_1 	ProviderId_1
+ProductId 	ProductId_7 	ProductId_7 	ProductId_7 	ProductId_7 	ProductId_7
+ProductCategory 	airtime 	airtime 	airtime 	airtime 	airtime
+ChannelId 	ChannelId_1 	ChannelId_1 	ChannelId_1 	ChannelId_1 	ChannelId_1
+TransactionStatus 	0 	0 	0 	0 	0
+IssuedDateLoan 	NaN 	NaN 	NaN 	NaN 	NaN
+AmountLoan 	NaN 	NaN 	NaN 	NaN 	NaN
+Currency 	NaN 	NaN 	NaN 	NaN 	NaN
+LoanId 	NaN 	NaN 	NaN 	NaN 	NaN
+PaidOnDate 	NaN 	NaN 	NaN 	NaN 	NaN
+IsFinalPayBack 	NaN 	NaN 	NaN 	NaN 	NaN
+InvestorId 	NaN 	NaN 	NaN 	NaN 	NaN
+DueDate 	NaN 	NaN 	NaN 	NaN 	NaN
+LoanApplicationId 	NaN 	NaN 	NaN 	NaN 	NaN
+PayBackId 	NaN 	NaN 	NaN 	NaN 	NaN
+ThirdPartyId 	NaN 	NaN 	NaN 	NaN 	NaN
+IsThirdPartyConfirmed 	NaN 	NaN 	NaN 	NaN 	NaN
+IsDefaulted 	NaN 	NaN 	NaN 	NaN 	NaN
+
+test_data.head().T
+
+	0 	1 	2 	3 	4
+CustomerId 	CustomerId_310 	CustomerId_243 	CustomerId_142 	CustomerId_142 	CustomerId_142
+TransactionStartTime 	43555.6 	43555.6 	43555.7 	43555.7 	43555.7
+Value 	14000 	1000 	2500 	500 	1000
+Amount 	-14000 	-1000 	-2500 	-500 	-1000
+TransactionId 	TransactionId_925 	TransactionId_1080 	TransactionId_2315 	TransactionId_1466 	TransactionId_337
+BatchId 	BatchId_1144 	BatchId_1214 	BatchId_2150 	BatchId_1071 	BatchId_2477
+SubscriptionId 	SubscriptionId_7 	SubscriptionId_7 	SubscriptionId_7 	SubscriptionId_7 	SubscriptionId_7
+CurrencyCode 	UGX 	UGX 	UGX 	UGX 	UGX
+CountryCode 	256 	256 	256 	256 	256
+ProviderId 	ProviderId_1 	ProviderId_1 	ProviderId_1 	ProviderId_1 	ProviderId_1
+ProductId 	ProductId_7 	ProductId_8 	ProductId_7 	ProductId_7 	ProductId_7
+ProductCategory 	airtime 	data_bundles 	airtime 	airtime 	airtime
+ChannelId 	ChannelId_1 	ChannelId_1 	ChannelId_1 	ChannelId_1 	ChannelId_1
+TransactionStatus 	1 	1 	1 	1 	1
+IssuedDateLoan 	43555.6 	43555.6 	43555.7 	43555.7 	43555.7
+LoanId 	LoanId_1027 	LoanId_768 	LoanId_1067 	LoanId_202 	LoanId_533
+InvestorId 	InvestorId_1 	InvestorId_1 	InvestorId_1 	InvestorId_1 	InvestorId_1
+LoanApplicationId 	LoanApplicationId_825 	LoanApplicationId_68 	LoanApplicationId_1223 	LoanApplicationId_633 	LoanApplicationId_309
+ThirdPartyId 	ThirdPartyId_1175 	ThirdPartyId_604 	ThirdPartyId_1521 	ThirdPartyId_406 	ThirdPartyId_302
+
+#Dropping two other Columns that don't affect the target
+
+train_data.drop(['AmountLoan','Currency','PaidOnDate','IsFinalPayBack','DueDate','PayBackId','IsThirdPartyConfirmed'], axis=1 , inplace=True)
+
+train_data.shape
+
+(2100, 20)
+
+test_data.shape
+
+(905, 19)
+
+train_data.isnull().sum()
+
+#test_data.isnull().sum()
+
+CustomerId                0
+TransactionStartTime      0
+Value                     0
+Amount                    0
+TransactionId             0
+BatchId                   0
+SubscriptionId            0
+CurrencyCode              0
+CountryCode               0
+ProviderId                0
+ProductId                 0
+ProductCategory           0
+ChannelId                 0
+TransactionStatus         0
+IssuedDateLoan          612
+LoanId                  612
+InvestorId              612
+LoanApplicationId       617
+ThirdPartyId            614
+IsDefaulted             612
+dtype: int64
+
+#import preprocessing module 
+
+from sklearn.preprocessing import LabelEncoder
+
+​
+
+# Convert target label to numerical Data
+
+le = LabelEncoder()
+
+train_data['CurrencyCode'] = le.fit_transform(train_data['CurrencyCode'])
+
+train_data['ProductCategory'] = le.fit_transform(train_data['ProductCategory'])
+
+#train_data['Personal or Business'] = le.fit_transform(train_data['Personal or Business'])
+
+# The str method maps the following function to each entry as a string
+
+train_data['LoanId'] = train_data.LoanId.str.replace('LoanId_', '')
+
+train_data['InvestorId'] = train_data.InvestorId.str.replace('InvestorId_', '')
+
+train_data['LoanApplicationId'] = train_data.LoanApplicationId.str.replace('LoanApplicationId_', '')
+
+train_data['ThirdPartyId'] = train_data.ThirdPartyId.str.replace('ThirdPartyId_', '')
+
+train_data['CustomerId'] = train_data.CustomerId.str.replace('CustomerId_', '')
+
+train_data['TransactionId'] = train_data.TransactionId.str.replace('TransactionId_', '')
+
+train_data['BatchId'] = train_data.BatchId.str.replace('BatchId_', '')
+
+train_data['SubscriptionId'] = train_data.SubscriptionId.str.replace('SubscriptionId_', '')
+
+train_data['ProviderId'] = train_data.ProviderId.str.replace('ProviderId_', '')
+
+train_data['ChannelId'] = train_data.ThirdPartyId.str.replace('ChannelId_', '')
+
+train_data['ProductId'] = train_data.ProductId.str.replace('ProductId_', '')
+
+#train_data.isnull().sum()
+
+train_data.head().T
+
+	0 	1 	2 	3 	4
+CustomerId 	27 	27 	27 	27 	27
+TransactionStartTime 	43364.5 	43368.4 	43368.4 	43370.4 	43370.5
+Value 	550 	550 	550 	1000 	500
+Amount 	-550 	-550 	-550 	-1000 	-500
+TransactionId 	1683 	2235 	1053 	2633 	71
+BatchId 	641 	820 	210 	876 	1362
+SubscriptionId 	2 	2 	4 	4 	4
+CurrencyCode 	0 	0 	0 	0 	0
+CountryCode 	256 	256 	256 	256 	256
+ProviderId 	1 	1 	1 	1 	1
+ProductId 	7 	7 	7 	7 	7
+ProductCategory 	0 	0 	0 	0 	0
+ChannelId 	NaN 	NaN 	NaN 	NaN 	NaN
+TransactionStatus 	0 	0 	0 	0 	0
+IssuedDateLoan 	NaN 	NaN 	NaN 	NaN 	NaN
+LoanId 	NaN 	NaN 	NaN 	NaN 	NaN
+InvestorId 	NaN 	NaN 	NaN 	NaN 	NaN
+LoanApplicationId 	NaN 	NaN 	NaN 	NaN 	NaN
+ThirdPartyId 	NaN 	NaN 	NaN 	NaN 	NaN
+IsDefaulted 	NaN 	NaN 	NaN 	NaN 	NaN
+
+#Filling the Missing/Null Values for tain and test
+
+#train_data = train_data.fillna(train_data.mean())
+
+#train_data = train_data.fillna(train_data.mode())
+
+train_data = train_data.fillna(train_data.median())
+
+​
+
+train_data.isnull().sum()
+
+CustomerId              0
+TransactionStartTime    0
+Value                   0
+Amount                  0
+TransactionId           0
+BatchId                 0
+SubscriptionId          0
+CurrencyCode            0
+CountryCode             0
+ProviderId              0
+ProductId               0
+ProductCategory         0
+ChannelId               0
+TransactionStatus       0
+IssuedDateLoan          0
+LoanId                  0
+InvestorId              0
+LoanApplicationId       0
+ThirdPartyId            0
+IsDefaulted             0
+dtype: int64
+
+train_data.head().T
+
+	0 	1 	2 	3 	4
+CustomerId 	27 	27 	27 	27 	27
+TransactionStartTime 	43364.5 	43368.4 	43368.4 	43370.4 	43370.5
+Value 	550 	550 	550 	1000 	500
+Amount 	-550 	-550 	-550 	-1000 	-500
+TransactionId 	1683 	2235 	1053 	2633 	71
+BatchId 	641 	820 	210 	876 	1362
+SubscriptionId 	2 	2 	4 	4 	4
+CurrencyCode 	0 	0 	0 	0 	0
+CountryCode 	256 	256 	256 	256 	256
+ProviderId 	1 	1 	1 	1 	1
+ProductId 	7 	7 	7 	7 	7
+ProductCategory 	0 	0 	0 	0 	0
+ChannelId 	1062.5 	1062.5 	1062.5 	1062.5 	1062.5
+TransactionStatus 	0 	0 	0 	0 	0
+IssuedDateLoan 	43501 	43501 	43501 	43501 	43501
+LoanId 	774 	774 	774 	774 	774
+InvestorId 	1 	1 	1 	1 	1
+LoanApplicationId 	821 	821 	821 	821 	821
+ThirdPartyId 	1062.5 	1062.5 	1062.5 	1062.5 	1062.5
+IsDefaulted 	0 	0 	0 	0 	0
+
+#test data
+
+test_data['CurrencyCode'] = le.fit_transform(test_data['CurrencyCode'])
+
+test_data['ProductCategory'] = le.fit_transform(test_data['ProductCategory'])
+
+# The str method maps the following function to each entry as a string
+
+test_data['LoanId'] = test_data.LoanId.str.replace('LoanId_', '')
+
+test_data['InvestorId'] = test_data.InvestorId.str.replace('InvestorId_', '')
+
+test_data['LoanApplicationId'] = test_data.LoanApplicationId.str.replace('LoanApplicationId_', '')
+
+test_data['ThirdPartyId'] = test_data.ThirdPartyId.str.replace('ThirdPartyId_', '')
+
+test_data['CustomerId'] = test_data.CustomerId.str.replace('CustomerId_', '')
+
+test_data['TransactionId'] = test_data.TransactionId.str.replace('TransactionId_', '')
+
+test_data['BatchId'] = test_data.BatchId.str.replace('BatchId_', '')
+
+test_data['SubscriptionId'] = test_data.SubscriptionId.str.replace('SubscriptionId_', '')
+
+test_data['ProviderId'] = test_data.ProviderId.str.replace('ProviderId_', '')
+
+test_data['ChannelId'] = test_data.ThirdPartyId.str.replace('ChannelId_', '')
+
+test_data['ProductId'] = test_data.ProductId.str.replace('ProductId_', '')
+
+test_data = test_data.fillna(test_data.median())
+
+#train_data.isnull().sum()
+
+test_data.isnull().sum()
+
+CustomerId              0
+TransactionStartTime    0
+Value                   0
+Amount                  0
+TransactionId           0
+BatchId                 0
+SubscriptionId          0
+CurrencyCode            0
+CountryCode             0
+ProviderId              0
+ProductId               0
+ProductCategory         0
+ChannelId               0
+TransactionStatus       0
+IssuedDateLoan          0
+LoanId                  0
+InvestorId              0
+LoanApplicationId       0
+ThirdPartyId            0
+dtype: int64
+
+test_data.head().T
+
+	0 	1 	2 	3 	4
+CustomerId 	310 	243 	142 	142 	142
+TransactionStartTime 	43555.6 	43555.6 	43555.7 	43555.7 	43555.7
+Value 	14000 	1000 	2500 	500 	1000
+Amount 	-14000 	-1000 	-2500 	-500 	-1000
+TransactionId 	925 	1080 	2315 	1466 	337
+BatchId 	1144 	1214 	2150 	1071 	2477
+SubscriptionId 	7 	7 	7 	7 	7
+CurrencyCode 	0 	0 	0 	0 	0
+CountryCode 	256 	256 	256 	256 	256
+ProviderId 	1 	1 	1 	1 	1
+ProductId 	7 	8 	7 	7 	7
+ProductCategory 	0 	1 	0 	0 	0
+ChannelId 	1175 	604 	1521 	406 	302
+TransactionStatus 	1 	1 	1 	1 	1
+IssuedDateLoan 	43555.6 	43555.6 	43555.7 	43555.7 	43555.7
+LoanId 	1027 	768 	1067 	202 	533
+InvestorId 	1 	1 	1 	1 	1
+LoanApplicationId 	825 	68 	1223 	633 	309
+ThirdPartyId 	1175 	604 	1521 	406 	302
+
+#Scaling using the Train Data on Minmax scaler
+
+from sklearn.preprocessing import MinMaxScaler
+
+scaler = MinMaxScaler()
+
+train_data_scale = pd.DataFrame(scaler.fit_transform(train_data), columns = train_data.columns)
+
+test_data_scale = pd.DataFrame(scaler.fit_transform(test_data), columns = test_data.columns)
+
+​
+
+train_data_scale.head().T
+
+#test_data_scale.head().T
+
+	0 	1 	2 	3 	4
+CustomerId 	0.051793 	0.051793 	0.051793 	0.051793 	0.051793
+TransactionStartTime 	0.000000 	0.020314 	0.020576 	0.031047 	0.031518
+Value 	0.000180 	0.000180 	0.000180 	0.000360 	0.000160
+Amount 	0.999820 	0.999820 	0.999820 	0.999640 	0.999840
+TransactionId 	0.632569 	0.840165 	0.395637 	0.989846 	0.026326
+BatchId 	0.247678 	0.316950 	0.080882 	0.338622 	0.526703
+SubscriptionId 	0.166667 	0.166667 	0.500000 	0.500000 	0.500000
+CurrencyCode 	0.000000 	0.000000 	0.000000 	0.000000 	0.000000
+CountryCode 	0.000000 	0.000000 	0.000000 	0.000000 	0.000000
+ProviderId 	0.000000 	0.000000 	0.000000 	0.000000 	0.000000
+ProductId 	0.333333 	0.333333 	0.333333 	0.333333 	0.333333
+ProductCategory 	0.000000 	0.000000 	0.000000 	0.000000 	0.000000
+ChannelId 	0.520343 	0.520343 	0.520343 	0.520343 	0.520343
+TransactionStatus 	0.000000 	0.000000 	0.000000 	0.000000 	0.000000
+IssuedDateLoan 	0.667114 	0.667114 	0.667114 	0.667114 	0.667114
+LoanId 	0.472205 	0.472205 	0.472205 	0.472205 	0.472205
+InvestorId 	0.000000 	0.000000 	0.000000 	0.000000 	0.000000
+LoanApplicationId 	0.501836 	0.501836 	0.501836 	0.501836 	0.501836
+ThirdPartyId 	0.520343 	0.520343 	0.520343 	0.520343 	0.520343
+IsDefaulted 	0.000000 	0.000000 	0.000000 	0.000000 	0.000000
+
+# Splitting the features from the target
+
+x_train_data = train_data_scale.iloc[:,0:-1]
+
+x_train_data.head().T
+
+	0 	1 	2 	3 	4
+CustomerId 	0.051793 	0.051793 	0.051793 	0.051793 	0.051793
+TransactionStartTime 	0.000000 	0.020314 	0.020576 	0.031047 	0.031518
+Value 	0.000180 	0.000180 	0.000180 	0.000360 	0.000160
+Amount 	0.999820 	0.999820 	0.999820 	0.999640 	0.999840
+TransactionId 	0.632569 	0.840165 	0.395637 	0.989846 	0.026326
+BatchId 	0.247678 	0.316950 	0.080882 	0.338622 	0.526703
+SubscriptionId 	0.166667 	0.166667 	0.500000 	0.500000 	0.500000
+CurrencyCode 	0.000000 	0.000000 	0.000000 	0.000000 	0.000000
+CountryCode 	0.000000 	0.000000 	0.000000 	0.000000 	0.000000
+ProviderId 	0.000000 	0.000000 	0.000000 	0.000000 	0.000000
+ProductId 	0.333333 	0.333333 	0.333333 	0.333333 	0.333333
+ProductCategory 	0.000000 	0.000000 	0.000000 	0.000000 	0.000000
+ChannelId 	0.520343 	0.520343 	0.520343 	0.520343 	0.520343
+TransactionStatus 	0.000000 	0.000000 	0.000000 	0.000000 	0.000000
+IssuedDateLoan 	0.667114 	0.667114 	0.667114 	0.667114 	0.667114
+LoanId 	0.472205 	0.472205 	0.472205 	0.472205 	0.472205
+InvestorId 	0.000000 	0.000000 	0.000000 	0.000000 	0.000000
+LoanApplicationId 	0.501836 	0.501836 	0.501836 	0.501836 	0.501836
+ThirdPartyId 	0.520343 	0.520343 	0.520343 	0.520343 	0.520343
+
+# Y is my Target (time from pick up to arrival)
+
+y_train_data = train_data_scale['IsDefaulted'].astype(int)
+
+y_train_data.head().T
+
+0    0
+1    0
+2    0
+3    0
+4    0
+Name: IsDefaulted, dtype: int32
+
+#y_train_data.
+
+#test_data['Order_No']=test_data.Order_No.str.replace('Order_No_','').astype(float)
+
+train_data.dtypes
+
+CustomerId               object
+TransactionStartTime    float64
+Value                   float64
+Amount                  float64
+TransactionId            object
+BatchId                  object
+SubscriptionId           object
+CurrencyCode              int32
+CountryCode               int64
+ProviderId               object
+ProductId                object
+ProductCategory           int32
+ChannelId                object
+TransactionStatus         int64
+IssuedDateLoan          float64
+LoanId                   object
+InvestorId               object
+LoanApplicationId        object
+ThirdPartyId             object
+IsDefaulted             float64
+dtype: object
+
+#Splitting the X_data to get a percentage to use for testing the model
+
+from sklearn.model_selection import train_test_split
+
+x_train, x_test, y_train, y_test = train_test_split(x_train_data, y_train_data, test_size = 0.3, random_state = 42)
+
+#Using the Logistic Regression model to predict
+
+from sklearn.linear_model import LogisticRegression
+
+​
+
+logreg = LogisticRegression()
+
+​
+
+logreg.fit(x_train,y_train)
+
+LogisticRegression(C=1.0, class_weight=None, dual=False, fit_intercept=True,
+          intercept_scaling=1, max_iter=100, multi_class='warn',
+          n_jobs=None, penalty='l2', random_state=None, solver='warn',
+          tol=0.0001, verbose=0, warm_start=False)
+
+​
+
+logreg.score(x_test,y_test)
+
+0.9428571428571428
+
+#Predicting Using the Test data
+
+y_predict = pd.Series(logreg.predict(test_data_scale))
+
+​
+
+y_predict.to_csv('predicted_2.csv')
+
+​
+
